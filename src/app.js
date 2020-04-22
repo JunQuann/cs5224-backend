@@ -16,7 +16,7 @@ const app = express();
 // Log requests to the console.
 app.use(logger("dev"));
 // Enable CORS request
-app.use(cors);
+app.use(cors());
 
 // Parse incoming requests data (https://github.com/expressjs/body-parser)
 app.use(json());

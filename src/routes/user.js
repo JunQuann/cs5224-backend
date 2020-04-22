@@ -12,12 +12,12 @@ const createOrFindLessonTags = async (userLessons, transaction) => {
     let lesson = userLessons[i];
     let [lessonTag, created] = await Lesson.findOrCreate({
       where: {
-        name: lesson
+        name: lesson,
       },
       defaults: {
-        name: lesson
+        name: lesson,
       },
-      transaction
+      transaction,
     });
     lessonTags.push(lessonTag);
   }
@@ -55,27 +55,27 @@ router.post("/", async (req, res) => {
   }
 });
 
-const getUserEventsAndLessons = async user => {
+const getUserEventsAndLessons = async (user) => {
   let userLessons = await user.getLessons();
   let userEvents = await user.getEvents();
 
-  userLessons = userLessons.map(lesson => {
+  userLessons = userLessons.map((lesson) => {
     return lesson.name;
   });
 
-  userEvents = userEvents.map(event => {
+  userEvents = userEvents.map((event) => {
     return {
       id: event.id,
       title: event.title,
       startDate: event.startDate,
-      endDate: event.endDate
+      endDate: event.endDate,
     };
   });
 
   let returnedUser = {
     ...user.toJSON(),
     lessons: userLessons,
-    events: userEvents
+    events: userEvents,
   };
 
   return returnedUser;
@@ -86,7 +86,7 @@ router.get("/:email", async (req, res) => {
   try {
     let user = await User.findOne({
       where: {
-        email: userEmail
+        email: userEmail,
       },
       attributes: [
         "email",
@@ -97,8 +97,8 @@ router.get("/:email", async (req, res) => {
         "gender",
         "about",
         "dob",
-        "languages_known"
-      ]
+        "languages_known",
+      ],
     });
 
     if (!user) throw new Error("User not found");
@@ -127,14 +127,14 @@ router.get("/", async (req, res) => {
         "gender",
         "about",
         "dob",
-        "languages_known"
-      ]
+        "languages_known",
+      ],
     });
 
     if (users.length === 0) throw new Error("Users not found");
 
     users = await Promise.all(
-      users.map(async user => {
+      users.map(async (user) => {
         let userInfo = await getUserEventsAndLessons(user);
         return userInfo;
       })
@@ -142,7 +142,7 @@ router.get("/", async (req, res) => {
 
     res.send(users);
   } catch (err) {
-    if (err.message == "User not found") {
+    if (err.message == "Users not found") {
       res.status(404).send({ error: err.message });
     } else {
       console.log(err.stack);
@@ -161,7 +161,7 @@ router.put("/:email", async (req, res) => {
     transaction = await _database.sequelize.transaction();
     let userToUpdate = await User.findOne({
       where: { email: userEmail },
-      transaction
+      transaction,
     });
 
     await userToUpdate.update(userUpdatedInformation, { transaction });
